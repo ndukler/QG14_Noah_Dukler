@@ -3,8 +3,6 @@ library(ggplot2)
 library(gridExtra)
 library(getopt)
 
-dir()
-
 spec = matrix(c(
   'help' , 'h', 0, "logical", "writes helpdocs",
   'file', 'i', 1, "character", "*.assoc.linear.adjusted file",
@@ -21,8 +19,6 @@ if ( !is.null(opt$help) ) {
   cat(getopt(spec, usage=TRUE));
   q(status=1);
 }
-
-print(opt$file)
 
 data = read.table(opt$file,header=TRUE)
 
