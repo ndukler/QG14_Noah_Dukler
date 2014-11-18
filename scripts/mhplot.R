@@ -5,10 +5,9 @@ library(getopt)
 spec = matrix(c(
   'help' , 'h', 0, "logical", "writes helpdocs",
   'file', 'i', 1, "character", "*.assoc.linear.adjusted file",
-  'gene' , 'g', 1, "character", "gene name",
+  'bim', 'b', 1, "character", "*.bim file to map SNPs to positions",
   'out' , 'o', 1, "character", "Output directory for plots"
 ), byrow=TRUE, ncol=5);
-
 
 opt = getopt(spec)
 
@@ -19,15 +18,23 @@ if ( !is.null(opt$help) ) {
   q(status=1);
 }
 
+gene=unlist(strsplit(basename(opt$file),split ="[.]"))[2]
+
+data = read.table(opt$file,header = TRUE)
+bim = read.table(opt$bim)
+names(bim)=c("CHR","SNP","NA","BP","MAJ","MIN")
+
+mer = merge(data,bim)
+mer$sig = mer$FDR_BH<0.5
 
 mhplot = function(x, genename){
-  plot = ggplot(data = x, aes(x=BP, y = -log10(P)))+
-    geom_point()+
+  plot = ggplot(data = x, aes(x=BP, y = -log10(UNADJ)))+
+    geom_point(aes(colour=sig))+
     labs(title=paste("Manhattan plot for", genename))
   return(plot)
 }
 
-path=file.path(opt$out,paste0("mhplot_",opt$gene,".pdf"))
+path=file.path(opt$out,paste0("mhplot_",gene,".pdf"))
 pdf(path)
-pplot(data,opt$gene)
+  mhplot(mer,gene)
 dev.off()

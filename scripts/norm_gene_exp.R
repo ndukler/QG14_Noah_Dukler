@@ -1,10 +1,9 @@
 args = commandArgs(trailingOnly = TRUE)
 setwd(args[1])
-dir()
 
 libpath=paste0(args[1],"/lib/") 
 .libPaths(new = libpath)
-if(!require("GenABEL")){
+if(suppressWarnings(suppressMessages(!require("GenABEL")))){
   install.packages("GenABEL",lib = libpath, repos='http://cran.us.r-project.org')
 }
 

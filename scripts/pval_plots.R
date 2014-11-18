@@ -6,10 +6,8 @@ library(getopt)
 spec = matrix(c(
   'help' , 'h', 0, "logical", "writes helpdocs",
   'file', 'i', 1, "character", "*.assoc.linear.adjusted file",
-  'gene' , 'g', 1, "character", "gene name",
   'out' , 'o', 1, "character", "Output directory for plots"
   ), byrow=TRUE, ncol=5);
-
 
 opt = getopt(spec)
 
@@ -21,19 +19,20 @@ if ( !is.null(opt$help) ) {
 }
 
 data = read.table(opt$file,header=TRUE)
+gene=unlist(strsplit(basename(opt$file),split ="[.]"))[2]
 
 pplot= function(x, genename){
-  hist = ggplot(data=x,aes(x= FDR_BH,y=..density..))+
+  hist = ggplot(data=x,aes(x= UNADJ,y=..density..))+
     geom_histogram()+
     labs(title=paste("P-value distribution for ", genename))
-  qq = ggplot(data=x,aes(sample = FDR_BH))+
-    stat_qq()+
+  qq = ggplot(data=x,aes(sample = UNADJ))+
+    stat_qq(distribution = qunif)+
     labs(title=paste("QQ plot for", genename))
   merge = grid.arrange(hist,qq)
   return(merge)
 }
 
-path=file.path(opt$out,paste0("pplot_",opt$gene,".pdf"))
+path=file.path(opt$out,paste0("pplot_",gene,".pdf"))
 pdf(path)
-  pplot(data,opt$gene)
+  pplot(data,gene)
 dev.off()
