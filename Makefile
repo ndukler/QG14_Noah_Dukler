@@ -8,62 +8,66 @@ PPATH ?= $(shell pwd)
 PDIR ?= $(shell echo test)#_`date +%Y%m%d%H%M%S`)
 HOME = $(PPATH)/$(PDIR)
 
+# All plink out directories now end with .plink so they can be programatically accessed
 INSTALL = $(HOME)/install.log
 CLEANDAT = $(HOME)/clean_data.log
-BASIC = $(HOME)/basic/make.log
-NBASIC = $(HOME)/norm_basic_analysis/make.log
-COVAR = $(HOME)/pop_covar/make.log
-STRAT = $(HOME)/pop_strat/make.log
-PERM = $(HOME)/pop_perm/make.log
+BASIC = $(HOME)/basic.plink/make.log
+NBASIC = $(HOME)/norm_basic.plink/make.log
+COVAR = $(HOME)/pop_covar.plink/make.log
+STRAT = $(HOME)/pop_strat.plink/make.log
+PERM = $(HOME)/pop_perm.plink/make.log
 
-all: cluster missing_stats $(BASIC) $(NBASIC) $(COVAR) $(STRAT) $(PERM)
+all: $(HOME)/cluster.log $(HOME)/missing_stats.log $(BASIC) $(NBASIC) $(COVAR) $(STRAT) $(PERM)
 
 $(INSTALL):./scripts/initialize_project.sh ./scripts/install_dependencies.R
 	mkdir -p $(HOME) 
 	./scripts/initialize_project.sh $(PDIR) scripts/config.mk > $@
 	./scripts/install_dependencies.R $(HOME) >> $@   
 
-missing_stats:$(INSTALL) ./scripts/genotype_stats.sh
-	./scripts/genotype_stats.sh $(HOME)
+$(HOME)/missing_stats.log:$(INSTALL) ./scripts/genotype_stats.sh
+	./scripts/genotype_stats.sh $(HOME) > $@
 
 $(CLEANDAT):$(INSTALL) ./scripts/process_data.sh
 	./scripts/process_data.sh $(HOME) $(SCRIPTDIR) &> $@ 
 
-cluster:$(CLEANDAT) ./scripts/cluster_genotypes.sh
-	./scripts/cluster_genotypes.sh $(HOME)
+$(HOME)/cluster.log:$(CLEANDAT) ./scripts/cluster_genotypes.sh
+	./scripts/cluster_genotypes.sh $(HOME) &> $@
 
 $(BASIC):$(CLEANDAT) ./scripts/basic.sh
-	mkdir -p $(HOME)/basic/plots
-	./scripts/basic.sh $(HOME) > $@
+	mkdir -p $(HOME)/basic.plink/plots
+	./scripts/basic.sh $(HOME) $(BASIC) > $@
 
-basic:$(BASIC) ./scripts/nbasic.sh $(HOME) # alias to run just this analysis at cmd line
-	mkdir -p $(HOME)/norm_basic_analysis/plots
-	./scripts/nbasic.sh $(HOME) > $@
+basic:$(BASIC) # alias to run just this analysis at cmd line 
 
-$(NBASIC):$(CLEANDAT)
+$(NBASIC):$(CLEANDAT) ./scripts/nbasic.sh $(HOME) 
+	mkdir -p $(HOME)/norm_basic.plink/plots
+	./scripts/nbasic.sh $(HOME) $(NBASIC) > $@
+
 
 nbasic:$(NBASIC)  # alias to run just this analysis at cmd line
 
 $(COVAR):$(CLEANDAT) ./scripts/covar.sh
-	mkdir -p $(HOME)/pop_covar/plots
-	./scripts/covar.sh $(HOME) > $@
+	mkdir -p $(HOME)/pop_covar.plink/plots
+	./scripts/covar.sh $(HOME) $(COVAR) > $@
 
 covar:$(COVAR)  # alias to run just this analysis at cmd line
 
 $(STRAT):$(CLEANDAT) ./scripts/strat.sh
-	mkdir -p $(HOME)/pop_strat/plots
-	./scripts/strat.sh $(HOME) > $@
+	mkdir -p $(HOME)/pop_strat.plink/plots
+	./scripts/strat.sh $(HOME) $(STRAT) > $@
 
 strat:$(STRAT)  # alias to run just this analysis at cmd line
 
 $(PERM):$(CLEANDAT) ./scripts/stratperm.sh
-	mkdir -p $(HOME)/pop_perm/plots
-	./scripts/stratperm.sh $(HOME) > $@
+	mkdir -p $(HOME)/pop_perm.plink/plots
+	./scripts/stratperm.sh $(HOME) $(PERM) > $@
 
 stratperm:$(PERM)  # alias to run just this analysis at cmd line
 
+plot: 
+
 partclean:
-	rm -rf $(BASIC) $(NBASIC) $(COVAR) $(STRAT) $(PERM) 
+	rm -rf `dirname $(BASIC)` `dirname $(NBASIC)` `dirname $(COVAR)` `dirname $(STRAT)` `dirname $(PERM)` 
 
 clean:
 	rm -rf $(HOME)
