@@ -1,11 +1,10 @@
+#!/usr/bin/env Rscript
+
 args = commandArgs(trailingOnly = TRUE)
 setwd(args[1])
 
 libpath=paste0(args[1],"/lib/") 
 .libPaths(new = libpath)
-if(suppressWarnings(suppressMessages(!require("GenABEL")))){
-  install.packages("GenABEL",lib = libpath, repos='http://cran.us.r-project.org')
-}
 
 library("GenABEL")
 phenotypes = read.table("processed_files/gene_expression.phe",header = T)
