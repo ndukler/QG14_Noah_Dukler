@@ -29,7 +29,7 @@ UsePackage <- function(package, defaultCRANmirror = "http://cran.at.r-project.or
   return(TRUE)
 }
 
-libraries <- c("ggplot2","GenABEL","grid","getopt")
+libraries <- c("ggplot2","GenABEL","gridExtra","getopt","reshape2")
 for(library in libraries) 
 { 
   if(!UsePackage(library))

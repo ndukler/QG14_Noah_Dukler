@@ -1,4 +1,8 @@
 #!/usr/bin/env Rscript
+
+.libPaths(new=Sys.getenv("TMPLIB"))
+
+
 library(ggplot2)
 library(gridExtra)
 library(getopt)
@@ -10,6 +14,7 @@ spec = matrix(c(
   ), byrow=TRUE, ncol=5);
 
 opt = getopt(spec)
+
 
 # if help was asked for print a friendly message
 # and exit with a non-zero error code

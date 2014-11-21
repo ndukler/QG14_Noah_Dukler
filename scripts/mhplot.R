@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+.libPaths(new=Sys.getenv("TMPLIB"))
 library(ggplot2)
 library(getopt)
 
@@ -25,7 +26,7 @@ bim = read.table(opt$bim)
 names(bim)=c("CHR","SNP","NA","BP","MAJ","MIN")
 
 mer = merge(data,bim)
-mer$sig = mer$FDR_BH<0.5
+mer$sig = mer$FDR_BH<0.05
 
 mhplot = function(x, genename){
   plot = ggplot(data = x, aes(x=BP, y = -log10(UNADJ)))+
