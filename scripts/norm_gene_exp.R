@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-
 args = commandArgs(trailingOnly = TRUE)
 setwd(args[1])
 
@@ -18,9 +17,11 @@ g=ggplot(reshaped,aes(x=value,y=..density..))+
   geom_histogram()+
   labs(title="Phenotype distributions")
 
-pdf("processed_files/pheno_dist.pdf")
+pdf("processed_files/pheno_dist.pdf",height = 4)
 g
 dev.off()
+
+apply(phenotypes[,3:ncol(phenotypes)],2,shapiro.test)
 
 phenotypes$MRPL40 <- rntransform(phenotypes$MRPL40)
 phenotypes$GGT5 <- rntransform(phenotypes$GGT5)

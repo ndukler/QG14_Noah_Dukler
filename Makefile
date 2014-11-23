@@ -27,14 +27,14 @@ $(INSTALL):./scripts/initialize_project.sh ./scripts/install_dependencies.R
 
 $(HOME)/missing_stats.log:$(INSTALL) ./scripts/genotype_stats.sh ./scripts/plot_maf.R
 	./scripts/genotype_stats.sh $(HOME) > $@
-	./scripts/plot_maf.R $(HOME) >> $@
+	./scripts/plot_maf.R $(HOME) 
 
 $(CLEANDAT):$(INSTALL) ./scripts/process_data.sh ./scripts/norm_gene_exp.R
 	./scripts/process_data.sh $(HOME) $(SCRIPTDIR) &> $@ 
 
 $(HOME)/cluster.log:$(CLEANDAT) ./scripts/cluster_genotypes.sh ./scripts/plot_mds.R
 	./scripts/cluster_genotypes.sh $(HOME) &> $@
-	./scripts/plot_mds.R $(HOME) &>> $@
+	./scripts/plot_mds.R $(HOME) 
 
 $(BASIC):$(CLEANDAT) ./scripts/basic.sh ./scripts/pval_plots.R ./scripts/mhplot.R
 	mkdir -p $(HOME)/basic.plink/plots
