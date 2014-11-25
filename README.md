@@ -10,6 +10,7 @@ Dependencies I do not install for you:
 
 To build my project just run Makefile from the directory it is in using command:
 make
+
 If you want to parallelize the analysis run with command:
 make -j num_of_cores
 
