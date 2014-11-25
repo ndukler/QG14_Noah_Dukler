@@ -20,7 +20,7 @@ RECODE = $(HOME)/recode/make.log
 
 export TMPLIB=$(HOME)/lib
 
-all: $(HOME)/cluster.log $(HOME)/missing_stats.log $(BASIC) $(NBASIC) $(COVAR) $(LD) $(RECODE)
+all: $(HOME)/cluster.log $(HOME)/missing_stats.log $(BASIC) $(NBASIC) $(COVAR) $(LD) 
 
 $(INSTALL):./scripts/initialize_project.sh ./scripts/install_dependencies.R
 	mkdir -p $(HOME) 
@@ -63,13 +63,12 @@ $(COVAR):$(CLEANDAT) ./scripts/covar.sh ./scripts/pval_plots.R ./scripts/mhplot.
 
 covar:$(COVAR)  # alias to run just this analysis at cmd line
 
-$(LD):$(CLEANDAT)  ./scripts/ld.sh
+$(LD):$(CLEANDAT)  ./scripts/ld.sh ./scripts/ld_assoc_plots.R
 	mkdir -p $(HOME)/LD/plots;
 	 ./scripts/ld.sh $(HOME) $(LD) > $@
-	./scripts/ld_assoc_plots.R
+	./scripts/ld_assoc_plots.R $(HOME) >@
 
 ld:$(LD)
-
 
 partclean:
 	rm -rf `dirname $(CLEANDAT)` `dirname $(BASIC)` `dirname $(NBASIC)` `dirname $(COVAR)` `dirname $(LD)`

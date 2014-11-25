@@ -1,13 +1,14 @@
 #!/usr/bin/env Rscript
 .libPaths(new=Sys.getenv("TMPLIB"))
-
 library(ggplot2)
 library(getopt)
+library(reshape2)
+args = commandArgs(trailingOnly = TRUE)
+setwd(args[1])
 
-setwd("~/Dropbox/Classes/QGG/QG14_Project_Noah_Dukler/scripts")
 
-lds = read.table("../test/LD/ld_square_TTC38.ld", quote="\"")
-nm = read.table("../test/LD/TTC38.bim")
+lds = read.table("LD/ld_square_TTC38.ld", quote="\"")
+nm = read.table("LD/TTC38.bim")
                 
 names(lds)=nm[,2]
 rownames(lds)=nm[,2]
@@ -26,13 +27,13 @@ p <- ggplot() +
   theme(axis.text.y = element_text(color="black"))+
   labs(x="SNP A", y = "SNP B",title=paste("Linkage Analysis of significant SNPs for", genename))+
   scale_fill_gradient(low = "grey", high = "steelblue",limits=c(0, 1))
-pdf(paste0("../test/LD/plots/",genename,"_LD.pdf"))
+pdf(paste0("LD/plots/",genename,"_LD.pdf"))
 p
 dev.off()
 
 
-lds = read.table("../test/LD/ld_square_FAM118A.ld", quote="\"")
-nm = read.table("../test/LD/FAM118A.bim")
+lds = read.table("LD/ld_square_FAM118A.ld", quote="\"")
+nm = read.table("LD/FAM118A.bim")
 
 names(lds)=nm[,2]
 rownames(lds)=nm[,2]
@@ -52,7 +53,7 @@ p <- ggplot() +
   labs(x="SNP A", y = "SNP B",title=paste("Linkage Analysis of significant SNPs for", genename))+
   scale_fill_gradient(low = "grey", high = "steelblue",limits=c(0, 1))
 
-pdf(paste0("../test/LD/plots/",genename,"_LD.pdf"))
+pdf(paste0("LD/plots/",genename,"_LD.pdf"))
 p
 dev.off()
 
