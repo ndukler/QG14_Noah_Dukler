@@ -12,15 +12,10 @@ libpath=paste0(args[1],"/lib/")
 
 print(.libPaths())
 print(rownames(installed.packages(lib.loc=.libPaths())))
-
-InstalledPackage <- function(package) 
-{
-  return(package %in% installed.packages())
-}
-
 UsePackage <- function(package, defaultCRANmirror = "http://cran.at.r-project.org") 
 {
-  if(!InstalledPackage(package))
+  print(package)
+  if(!require(package,character.only = TRUE))
   {
     options(repos = c(CRAN = defaultCRANmirror))
     suppressMessages(suppressWarnings(install.packages(package)))

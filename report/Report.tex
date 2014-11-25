@@ -9,6 +9,7 @@
 \begin{document}
 \noindent Noah Dukler
 
+\section{Methods \& Results}
 Data for this project were derived from 79 chinese and 107 Yoruban individuals for a total study size of 186 people. The gender breakdown was 92 females and 94 males however only SNP data for chromosome 22 was included for this study so sex specific effects are highly unlikely. SNP data was filtered to remove alleles with MAF$<0.05$ resulting in the removal of 562 variants. All individuals were completely genotyped so none were removed. Re-clustering all study individuals based on genotype cleanly recapitulated the ethnic labeling in the HapMap files along the 1st PC with no obvious outliers so no individuals appear to be mislabeled (fig. \ref{fig:mds}). Individuals were not separated by sex along any of the other PCs as expected since the sex chromosomes were not included.   
 
 \begin{figure}[h]
@@ -27,24 +28,28 @@ The phenotypes of interest were the expression levels of three genes GGT5, MRPL4
 \label{fig:pheno_dist}
 \end{figure}
 
-The data for TTC38 were strongly non-normally distributed, violating the assumption of the regression model risking an increased false positive rate so I performed quantile renormalization on all three phenotypes for consistent data treatment \cite{goh_effects_2009}. Using PLINK I fit the data to a naive association model of the form:
+The data for TTC38 were strongly non-normally distributed, violating the assumption of the regression model risking an increased false positive rate so I performed quantile renormalization on all three phenotypes for consistent data treatment. Using PLINK I fit the data to a naive association model of the form:
 
 $$
 	Norm.~Gene~Expression = Genotype + \epsilon
 $$
 
-Genotypes are recoded as $aa=0$, $Aa=1$, and $AA=2$, giving a unique encoding to all allelic combinations. However the p-values resulting from this analysis were left-highly skewed indicating that there would be a high false positive rate resulting from this analysis (fig. \ref{norm_assoc}). 
-
 \begin{figure}
 \subfloat[GGT5 \label{fig3:test1}]
-  {\includegraphics[width=.3\linewidth]{../test/norm_basic.plink/plots/pplot_GGT5.pdf}}\hfill
+  {\includegraphics[width=.25\linewidth]{../test/norm_basic.plink/plots/pplot_GGT5.pdf}}\hfill
 \subfloat[MRPL40 \label{fig3:test2}]
-  {\includegraphics[width=.3\linewidth]{../test/norm_basic.plink/plots/pplot_MRPL40.pdf}}\hfill
+  {\includegraphics[width=.25\linewidth]{../test/norm_basic.plink/plots/pplot_MRPL40.pdf}}\hfill
 \subfloat[TTC38\label{fig3:test3}]
-  {\includegraphics[width=.3\linewidth]{../test/norm_basic.plink/plots/pplot_TTC38.pdf}}
+  {\includegraphics[width=.25\linewidth]{../test/norm_basic.plink/plots/pplot_TTC38.pdf}}
+ \subfloat[FAM118A\label{fig3:test4}]
+   {\includegraphics[width=.25\linewidth]{../test/norm_basic.plink/plots/pplot_FAM118A.pdf}}
 \caption{Histogram and qqplot of p-values derived from fitting basic association model to rank normalized expression data for three genes.}
 \label{norm_assoc}
 \end{figure}   
+
+
+Genotypes are recoded as $aa=0$, $Aa=1$, and $AA=2$, giving a unique encoding to all allelic combinations. However the p-values resulting from this analysis were left-highly skewed indicating that there would be a high false positive rate resulting from this analysis (fig.). 
+
 
 This inflation in the frequency of low p-values often results from unmodeled substructure in the population. From our PCA analysis we already know that the study population clusters into two distinct subpopulations based upon ethnicity. Therefore we revise our previous model to include a covariate to model ethnic background as follows: 
 
@@ -66,32 +71,40 @@ Ethnicity was recoded by representing CHB individuals as 1 and YRIs as 2. The p-
 \end{figure}
 
 \begin{figure}
-\caption{Manhattan plots of p-values derived from fitting an association model that includes ethnicity to rank normalized expression data for three genes.}
 \label{fig:merged_mhplot}
 \includegraphics[width=1\linewidth]{./merged_mhplot}
+\caption{Manhattan plots of p-values derived from fitting an association model that includes ethnicity to rank normalized expression data for three genes.}
 \end{figure}
 
-Of the three genes only one, TTC38 appeared to have any causal eQTLs on chromosome 22 between 14430353 and 49565872bp. Five eQTLs were identified of which 
+Of the three genes only one, TTC38 appeared to have any causal eQTLs on chromosome 22 between 14430353 and 49565872bp. Five eQTLs were identified: rs5999089, rs6008538, rs6008598, rs6971, rs9626816 using an FDR threshold of 0.05 (tab. \ref{eQTL_tab}). Of those, three: rs6008538, rs6008598, rs9626816 seem to be in LD with each other (fig \ref{fig:TTC38_LD}). Thus it appears likely that we have three regions that contain eQTL candidates for the gene TTC38.   
 
 \begin{table}[h]
 \centering
 \begin{tabular}{llrr}
   \hline
-GENE & SNP & BP & FDR\_BH \\ 
+GENE & SNP & BP (hg18) & FDR\_BH \\ 
   \hline
-TTC38 & rs5999089 & 32484444 & 0.05 \\ 
-  TTC38 & rs6008538 & 45064627 & 0.00 \\ 
-  TTC38 & rs6008598 & 45082907 & 0.00 \\ 
-  TTC38 & rs6971 & 41888870 & 0.02 \\ 
-  TTC38 & rs9626816 & 45020262 & 0.01 \\ 
+  TTC38 & rs5999089 & 32484444 & 4.51e-02 \\ 
+  TTC38 & rs6971 & 41888870 & 2.44e-02 \\ 
+  TTC38 & rs6008538* & 45064627 & 8.92e-04 \\ 
+  TTC38 & rs6008598* & 45082907 & 3.20e-10 \\ 
+  TTC38 & rs9626816* & 45020262 & 1.35e-02 \\ 
    \hline
 \end{tabular}
-\caption[eQTL]{Causal eQTLs identified by model that included ethnic covariate.}
+\caption[eQTL]{Causal eQTLs identified by model that included ethnic covariate. (* SNPs are in LD). }
+\label{eQTL_tab}
 \end{table}
 
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{./TTC38_LD}
+\caption{Clustered LD profiles for TTC38 candidate eQTLs.}
+\label{fig:TTC38_LD}
+\end{figure}
 
-\FloatBarrier
-\bibliography{GWAS}
-\bibliographystyle{plain}
+\section{Discussion}
+     TTC38 (tetratricopeptide repeat domain 38) is a protein-coding gene whose function has not yet been elucidated. Of the five SNPs I recovered as potential eQTLs, the one that has the weakest statistical evidence is rs5999089. Furthermore the SNP itself is an intron variant with no evidence of conservation in according to phyloP scores derived from 100 vertebrate lineages. There is also no evidence of transcription factor binding by any of the 161 TFs that ENCODE did ChIP-seq for in their cell lines. Therefore it is unlikely that rs5999089 is an eQTL. The other unlikely candidate eQTL is rs6971 which is in an exon of the TSPO gene. Rs6971 is a missense coding variant that renders the gene non-functional. TPSO is a translocator protein which moves cholesterol into the mitochondria as part of steroid hormone synthesis. While rs6971 is almost certainly important in TPSO function and has been previously linked to bipolar disorder there is no evidence of a protein-protein interaction between TPSO and TTC38. However TTC38 does interact with RDH13, a retinol dehydrogenase which may help protect the mitochondria against oxidative stress. Thus TTC38 and TPSO are linked in a roundabout way however given that rs6971 is in a coding region, has other clear functional activity, and showed a relatively weak association with TTC38 expression, it is unlikely to be causal. Perhaps the association is simply correlative, when one part of the steroid synthesis fails, the expression other genes that are involved (potentially) change as well.
+     
+     The most likely region for the causal SNP is marked by three SNPs rs6008538, rs6008598, rs9626816 which are in LD. Of those three rs6008598 has the most significant association by a significant margin. However rs6008598 is located in the coding region of the GTSE1 protein and it is a synonymous mutation thus making it unlikely that it is the causal mutation itself. Instead it is probably some other SNP in LD with rs6008598. This             
 
 \end{document}
