@@ -26,6 +26,8 @@ apply(phenotypes[,3:ncol(phenotypes)],2,shapiro.test)
 phenotypes$MRPL40 <- rntransform(phenotypes$MRPL40)
 phenotypes$GGT5 <- rntransform(phenotypes$GGT5)
 phenotypes$TTC38 <- rntransform(phenotypes$TTC38)
+phenotypes$FAM118A <- rntransform(phenotypes$FAM118A)
+
 
 reshaped = melt(phenotypes[2:ncol(phenotypes)])
 

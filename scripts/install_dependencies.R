@@ -10,25 +10,17 @@ setwd(args[1])
 libpath=paste0(args[1],"/lib/") 
 .libPaths(new = libpath)
 
-print(.libPaths())
-print(rownames(installed.packages(lib.loc=.libPaths())))
-UsePackage <- function(package, defaultCRANmirror = "http://cran.at.r-project.org") 
-{
-  print(package)
-  if(!require(package,character.only = TRUE))
-  {
-    options(repos = c(CRAN = defaultCRANmirror))
-    suppressMessages(suppressWarnings(install.packages(package)))
-    if(!InstalledPackage(package)) return(FALSE)
-  }
-  return(TRUE)
-}
+write("---Library locations detected---",stderr())
+write(.libPaths(),stderr())
+write("--------------------------------",stderr())
+defaultCRANmirror = "http://cran.rstudio.com/"
 
-libraries <- c("ggplot2","GenABEL","gridExtra","getopt","reshape2")
-for(library in libraries) 
+libraries <- c("ggplot2","GenABEL","gridExtra","getopt","reshape2","xtable","plyr")
+for(l in 1:length(libraries)) 
 { 
-  if(!UsePackage(library))
+   if(!(require(libraries[l],character.only = TRUE)))
   {
-    stop("Error!", library)
-  }
+     #print(libraries[l])
+     install.packages(libraries[l],repos=defaultCRANmirror)
+  }  
 }

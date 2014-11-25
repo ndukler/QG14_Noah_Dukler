@@ -7,10 +7,6 @@ dir=`dirname $2`
 plink --bfile processed_files/clean_genotypes --linear --adjust --pheno processed_files/gene_expression.phe --out $dir/basic --all-pheno 
 
 cd $dir
-
-while read line; do
-    $HOME/scripts/pval_plots.R -i $line -o plots;
-    $HOME/scripts/mhplot.R -i $line -b $1/processed_files/clean_genotypes.bim -o plots
-done < <(ls -1 | grep .assoc.linear.adjusted) 
-
+$HOME/scripts/joint_qqplot.R -d $dir -o plots
+$HOME/scripts/joint_mhplot.R -d $dir -b $1/processed_files/clean_genotypes.bim -o plots
 echo "\n"

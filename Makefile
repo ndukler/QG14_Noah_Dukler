@@ -10,6 +10,7 @@ HOME = $(PPATH)/$(PDIR)
 
 # All plink out directories now end with .plink so they can be programatically accessed
 INSTALL = $(HOME)/install.log
+RESHAPE  = $(HOME)/processed_files/reshaped_data.log
 CLEANDAT = $(HOME)/processed_files/clean_data.log
 BASIC = $(HOME)/basic.plink/make.log
 NBASIC = $(HOME)/norm_basic.plink/make.log
@@ -26,12 +27,19 @@ $(INSTALL):./scripts/initialize_project.sh ./scripts/install_dependencies.R
 	./scripts/initialize_project.sh $(PDIR) scripts/config.mk > $@
 	./scripts/install_dependencies.R $(HOME) >> $@   
 
-$(HOME)/missing_stats.log:$(INSTALL) $(CLEANDAT) ./scripts/genotype_stats.sh ./scripts/plot_maf.R
+install: $(INSTALL)
+
+$(RESHAPE): $(INSTALL) ./scripts/reshape_data.sh	
+	mkdir -p $(HOME)/processed_files
+	./scripts/reshape_data.sh $(HOME) &> $@
+
+$(HOME)/missing_stats.log:$(RESHAPE) ./scripts/genotype_stats.sh ./scripts/plot_maf.R
 	./scripts/genotype_stats.sh $(HOME) > $@
 	./scripts/plot_maf.R $(HOME) 
 
-$(CLEANDAT):$(INSTALL) ./scripts/process_data.sh ./scripts/norm_gene_exp.R
-	./scripts/process_data.sh $(HOME) $(SCRIPTDIR) &> $@ 
+$(CLEANDAT):$(RESHAPE) ./scripts/filter_data.sh ./scripts/norm_gene_exp.R ./scripts/detect_pheno_outliers.R
+	./scripts/detect_pheno_outliers.R $(HOME) &> $@
+	./scripts/filter_data.sh $(HOME) $(SCRIPTDIR) &>> $@
 
 $(HOME)/cluster.log:$(CLEANDAT) ./scripts/cluster_genotypes.sh ./scripts/plot_mds.R
 	./scripts/cluster_genotypes.sh $(HOME) &> $@
@@ -55,17 +63,10 @@ $(COVAR):$(CLEANDAT) ./scripts/covar.sh ./scripts/pval_plots.R ./scripts/mhplot.
 
 covar:$(COVAR)  # alias to run just this analysis at cmd line
 
-$(RECODE):$(CLEANDAT)
-	mkdir -p $(HOME)/recode
-	cd $(HOME);\
-	plink --noweb --bfile processed_files/clean_genotypes --recode 12 --out recode/clean_recode > $@; echo "\n" >> $@
-	cd $(HOME)/recode; head -1 clean_recode.raw | sed  s/" "/"\n"/g | sed s/_[A-Z]*//g > recode_colnames.txt
-
-recode:$(RECODE)
-
 $(LD):$(CLEANDAT)  ./scripts/ld.sh
 	mkdir -p $(HOME)/LD/plots;
 	 ./scripts/ld.sh $(HOME) $(LD) > $@
+	./scripts/ld_assoc_plots.R
 
 ld:$(LD)
 
